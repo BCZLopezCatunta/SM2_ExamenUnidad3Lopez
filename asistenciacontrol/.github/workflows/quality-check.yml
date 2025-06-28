@@ -1,35 +1,40 @@
 name: Quality Check
 
 on:
+  # Se ejecuta en cada push a la rama 'main'
   push:
     branches: [main]
+  # También se ejecuta en cada pull request hacia 'main'
   pull_request:
     branches: [main]
 
 jobs:
-  analyze:
+  # Nombre del trabajo que se va a ejecutar
+  quality-check-job:
+    # Se ejecuta en una máquina virtual de Ubuntu (la más reciente)
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Clona el repositorio para que el workflow tenga acceso al código
-      - uses: actions/checkout@v3
+      # Paso 1: Descarga tu código del repositorio a la máquina virtual
+      - name: Checkout repository code
+        uses: actions/checkout@v3
 
-      # 2. Configura el entorno de Flutter con una versión específica
-      - name: Set up Flutter
+      # Paso 2: Configura el entorno de Flutter
+      - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.3'  # Puedes ajustar esto a la versión que usas
+          flutter-version: '3.19.0' # Asegúrate que coincida con tu versión o déjala así
           channel: 'stable'
-          cache: true # Habilita el caché para acelerar ejecuciones futuras
+          cache: true # Usa caché para acelerar futuras ejecuciones
 
-      # 3. Instala todas las dependencias del proyecto
+      # Paso 3: Instala las dependencias de tu proyecto
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Ejecuta el analizador de código estático de Flutter
-      - name: Analyze
+      # Paso 4: Analiza el código en busca de errores y advertencias
+      - name: Analyze project source
         run: flutter analyze
 
-      # 5. Ejecuta todas las pruebas unitarias en la carpeta /test
-      - name: Run tests
+      # Paso 5: Ejecuta las pruebas unitarias
+      - name: Run unit tests
         run: flutter test
