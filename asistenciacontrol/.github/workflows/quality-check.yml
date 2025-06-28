@@ -6,35 +6,30 @@ on:
   pull_request:
     branches: [main]
 
-# Define los trabajos (jobs) que se ejecutarán. Puedes tener varios.
 jobs:
-  # Nombre del trabajo. Puedes llamarlo como quieras (ej: build, test, flutter_test).
-  analyze-and-test:
-    # El tipo de máquina virtual donde se ejecutará el trabajo. 'ubuntu-latest' es común y económico.
+  analyze:
     runs-on: ubuntu-latest
 
-    # La secuencia de pasos que se ejecutarán en orden.
     steps:
-      # 1. Descarga tu código del repositorio a la máquina virtual.
+      # 1. Clona el repositorio para que el workflow tenga acceso al código
       - uses: actions/checkout@v3
 
-      # 2. Instala el SDK de Flutter en la máquina virtual.
+      # 2. Configura el entorno de Flutter con una versión específica
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          # IMPORTANTE: Asegúrate de que esta versión coincida con la que usas en tu proyecto.
-          # Puedes verlo ejecutando 'flutter --version' en tu terminal.
-          flutter-version: '3.19.0' 
-          channel: 'stable' # Es buena práctica especificar el canal.
+          flutter-version: '3.24.3'  # Puedes ajustar esto a la versión que usas
+          channel: 'stable'
+          cache: true # Habilita el caché para acelerar ejecuciones futuras
 
-      # 3. Descarga todas las dependencias de tu proyecto (definidas en pubspec.yaml).
+      # 3. Instala todas las dependencias del proyecto
       - name: Install dependencies
         run: flutter pub get
 
-      # 4. Ejecuta el analizador de código estático. Busca errores de estilo y potenciales bugs.
-      - name: Analyze project source
+      # 4. Ejecuta el analizador de código estático de Flutter
+      - name: Analyze
         run: flutter analyze
 
-      # 5. Ejecuta todas las pruebas unitarias que encuentre en la carpeta 'test/'.
-      - name: Run widget tests
+      # 5. Ejecuta todas las pruebas unitarias en la carpeta /test
+      - name: Run tests
         run: flutter test
